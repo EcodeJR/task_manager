@@ -1,7 +1,7 @@
 {
   "version": 2,
   "builds": [
-    { "source": "src/index.js", "use": "@vercel/static-build", "config": { "distDir": "build" } }
+    { "src": "src/index.js", "use": "@vercel/static-build", "config": { "distDir": "build" } }
   ],
   "headers": [
         {
