@@ -19,7 +19,11 @@ const PORT = process.env.PORT || 5000
 require("./jobs/taskNotifications")
 
 // Middleware
-app.use(cors())
+// Set CORS origin from .env (CLIENT_ORIGIN)
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
+  credentials: true,
+}))
 app.use(express.json())
 
 // Connect to MongoDB
@@ -36,9 +40,9 @@ app.use("/api/chat", chatRoutes)
 app.use("/api/users", userRoutes)
 
 // Serve static files from React build in production
-if (process.env.NODE_ENV === "production") {
+// Only serve static files in production if you deploy client+server together
+if (process.env.NODE_ENV === "production" && process.env.SERVE_CLIENT === "true") {
   app.use(express.static(path.join(__dirname, "../client/build")))
-
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/build", "index.html"))
   })

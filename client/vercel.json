@@ -1,9 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "src/index.js", "use": "@vercel/static-build", "config": { "distDir": "build" } }
-  ],
-  "headers": [
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ],
+    "headers": [
         {
             "source": "/(.*)",
             "headers": [
@@ -14,7 +16,10 @@
             ]
         }
     ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build"
+        }
+    ]
 }

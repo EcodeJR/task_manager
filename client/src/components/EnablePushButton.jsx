@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { registerServiceWorkerAndSubscribe } from '../utils/push';
 import { useAuth } from '../lib/auth-context';
 
-const VAPID_PUBLIC_KEY = process.env.REACT_APP_VAPID_PUBLIC_KEY;
+// Set your VAPID public key in .env: REACT_APP_PUSH_PUBLIC_KEY=your-vapid-public-key
+const VAPID_PUBLIC_KEY = process.env.REACT_APP_PUSH_PUBLIC_KEY;
 
 export default function EnablePushPopup() {
   const [enabled, setEnabled] = useState(false);
