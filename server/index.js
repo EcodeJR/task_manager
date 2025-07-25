@@ -21,18 +21,22 @@ require("./jobs/taskNotifications")
 // Middleware
 // Set CORS origin from .env (CLIENT_ORIGIN)
 // Allow multiple origins for CORS (comma-separated in CLIENT_ORIGIN)
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000").split(',').map(origin => origin.trim());
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  "http://localhost:3000"
+].filter(Boolean);
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS: ' + origin));
+  origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+      } else {
+          callback(new Error('Not allowed by CORS'));
+      }
   },
   credentials: true,
-}))
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+}));
 app.use(express.json())
 
 // Connect to MongoDB

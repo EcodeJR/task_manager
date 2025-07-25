@@ -8,10 +8,14 @@ const Alert = React.forwardRef(({ className, variant, ...props }, ref) => (
     className={cn(
       "relative w-full rounded-lg border p-4",
       {
-        "bg-background text-foreground": variant === "default",
-        "bg-destructive/15 text-destructive border-destructive": variant === "destructive",
-        "bg-muted/50 text-foreground": variant === "muted",
-        "border-amber-500/50 text-amber-700 bg-amber-50/50": variant === "warning",
+        // Default
+        "bg-background text-foreground dark:bg-zinc-900 dark:text-zinc-100": variant === "default",
+        // Destructive
+        "bg-destructive/15 text-destructive border-destructive dark:bg-red-950 dark:text-red-200 dark:border-red-600": variant === "destructive",
+        // Muted
+        "bg-muted/50 text-foreground dark:bg-zinc-800/70 dark:text-zinc-200": variant === "muted",
+        // Warning
+        "border-amber-500/50 text-amber-700 bg-amber-50/50 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-400": variant === "warning",
       },
       className,
     )}
