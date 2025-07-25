@@ -14,14 +14,31 @@ const NotificationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  read: {
-    type: Boolean,
-    default: false,
-  },
+  readBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    required: false,
+  },
+  departmentId: {
+    type: String,
     required: true,
+  },
+  createdBy: {
+    type: String,
+    required: true
+  },
+  taskId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Task",
+    required: false,
+  },
+  notifType: {
+    type: String,
+    required: false,
   },
 })
 

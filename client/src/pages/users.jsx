@@ -83,7 +83,6 @@ export default function UsersPage() {
         await addNotification({
           type: "success",
           message: `User ${approvedUser.name} has been approved`,
-          userId: user.id,
         })
 
         toast({
@@ -114,7 +113,6 @@ export default function UsersPage() {
         await addNotification({
           type: "info",
           message: `User ${rejectedUser.name} has been rejected`,
-          userId: user.id,
         })
 
         toast({

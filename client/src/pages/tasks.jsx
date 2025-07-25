@@ -9,6 +9,7 @@ import { useAuth } from "../lib/auth-context"
 import { useNotifications } from "../lib/notification-context"
 import { useTasks } from "../lib/task-context"
 import { Plus, Trash2 } from "lucide-react"
+import { useEffect } from "react"
 
 import { Dialog, DialogHeader, DialogTitle, DialogContent } from "../components/ui/dialog";
 
@@ -18,6 +19,17 @@ export default function TasksPage() {
   const { addNotification } = useNotifications()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    console.log(isDark);
+    if (isDark === true) {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+    }
+  }, []);
 
   const departmentTasks = user ? getTasksByDepartment(user.department.id) : []
 
@@ -28,7 +40,6 @@ export default function TasksPage() {
       addNotification({
         type: completed ? "success" : "info",
         message: completed ? `Task marked as completed` : `Task marked as incomplete`,
-        userId: user.id,
       })
 
       toast({
@@ -49,7 +60,6 @@ export default function TasksPage() {
     addNotification({
       type: "info",
       message: `Task "${task.title}" has been deleted`,
-      userId: user.id,
     })
 
     toast({
@@ -194,43 +204,45 @@ export default function TasksPage() {
               }}
             >
               <div>
-                <label className="block text-left font-medium mb-1" htmlFor="title">Title<span className="text-red-500">*</span></label>
+                <label className={`block text-left font-medium mb-1 ${isDarkMode ? "text-white" : "text-black"}`} htmlFor="title">Title<span className="text-red-500">*</span></label>
                 <input
                   id="title"
                   name="title"
                   type="text"
-                  className="w-full border rounded px-3 py-2"
+                  placeholder="e.g Compiling the names of Engineering Interns."
+                  className={`w-full border rounded px-3 py-2 ${isDarkMode ? "bg-gray-800" : "text-black"}`}
                   required
                 />
               </div>
               <div>
-                <label className="block text-left font-medium mb-1" htmlFor="description">Description<span className="text-red-500">*</span></label>
+                <label className={`block text-left font-medium mb-1 ${isDarkMode ? "text-white" : "text-black"}`} htmlFor="description">Description<span className="text-red-500">*</span></label>
                 <textarea
                   id="description"
                   name="description"
+                  placeholder="e.g The department was asked to provide the total number of intern in it's department."
                   rows={3}
-                  className="w-full border rounded px-3 py-2"
+                  className={`w-full border rounded px-3 py-2 ${isDarkMode ? "bg-gray-800" : "text-black"}`}
                   required
                 />
               </div>
               <div>
-                <label className="block text-left font-medium mb-1" htmlFor="department">Department</label>
+                <label className={`block text-left font-medium mb-1 ${isDarkMode ? "text-white" : "text-black"}`} htmlFor="department">Department</label>
                 <input
                   id="department"
                   name="department"
                   type="text"
-                  className="w-full border rounded px-3 py-2 bg-gray-100"
+                  className={`w-full border rounded px-3 py-2 ${isDarkMode ? "bg-gray-800" : "text-black"}`}
                   value={user?.department?.name || ""}
                   disabled
                   readOnly
                 />
               </div>
               <div>
-                <label className="block text-left font-medium mb-1" htmlFor="urgency">Urgency</label>
+                <label className={`block text-left font-medium mb-1 ${isDarkMode ? "text-white" : "text-black"}`} htmlFor="urgency">Urgency</label>
                 <select
                   id="urgency"
                   name="urgency"
-                  className="w-full border rounded px-3 py-2"
+                  className={`w-full border rounded px-3 py-2 ${isDarkMode ? "bg-gray-800" : "text-black"}`}
                   defaultValue="medium"
                 >
                   <option value="low">Low</option>
@@ -240,12 +252,12 @@ export default function TasksPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-left font-medium mb-1" htmlFor="dueDate">Due Date<span className="text-red-500">*</span></label>
+                <label className={`block text-left font-medium mb-1 ${isDarkMode ? "text-white" : "text-black"}`} htmlFor="dueDate">Due Date<span className="text-red-500">*</span></label>
                 <input
                   id="dueDate"
                   name="dueDate"
                   type="date"
-                  className="w-full border rounded px-3 py-2"
+                  className={`w-full border rounded px-3 py-2 ${isDarkMode ? "bg-gray-800" : "text-black"}`}
                   required
                 />
               </div>

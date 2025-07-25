@@ -7,13 +7,13 @@ import { TaskProvider } from "./task-context"
 export function Providers({ children }) {
   return (
     <AuthProvider>
-      <TaskProvider>
-        <NotificationProvider>
+      <NotificationProvider>
+        <TaskProvider>
           <ChatProvider>
             <SidebarProvider>{children}</SidebarProvider>
           </ChatProvider>
-        </NotificationProvider>
-      </TaskProvider>
+        </TaskProvider>
+      </NotificationProvider>
     </AuthProvider>
   )
 }

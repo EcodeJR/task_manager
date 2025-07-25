@@ -2,11 +2,13 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useAuth } from "./auth-context"
+import { useNotifications } from "./notification-context"
 import api from "./api"
 
 const TaskContext = createContext(undefined)
 
 export function TaskProvider({ children }) {
+  const { addNotification } = useNotifications();
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
@@ -55,6 +57,15 @@ export function TaskProvider({ children }) {
       }
 
       setTasks((prev) => [...prev, newTask])
+      // Send notification to department
+      if (addNotification && user) {
+        addNotification({
+          type: "info",
+          message: `A new task was added: "${newTask.title}" by ${user.name}`,
+          departmentId: user.department.id,
+          createdBy: user.name,
+        })
+      }
       return newTask
     } catch (error) {
       console.error("Error adding task:", error)

@@ -91,4 +91,15 @@ router.get("/departments", auth, async (req, res) => {
   }
 })
 
+// Save browser push subscription for the current user
+router.post('/push-subscription', auth, async (req, res) => {
+  try {
+    req.user.pushSubscription = req.body.subscription;
+    await req.user.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router

@@ -7,12 +7,21 @@ import { useSidebar } from "../lib/sidebar-context"
 import { Bell, LogOut, Menu } from "lucide-react"
 import NotificationDropdown from "./notification-dropdown"
 import { useNavigate } from "react-router-dom"
+import EnablePushPopup from "./EnablePushButton";
+import { useNotifications } from "../lib/notification-context";
 
 export default function DashboardHeader() {
   const { user, logout } = useAuth()
   const { toggleSidebar } = useSidebar()
   const navigate = useNavigate()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const { getDepartmentUnreadCount } = useNotifications();
+  const unreadCount = getDepartmentUnreadCount();
+
+  // Button toggle logic: always toggles open/close
+  const handleNotificationClick = () => {
+    setNotificationsOpen((open) => !open);
+  };
 
   const handleLogout = () => {
     logout()
@@ -29,8 +38,11 @@ export default function DashboardHeader() {
       </div>
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Button variant="ghost" size="icon" onClick={() => setNotificationsOpen(!notificationsOpen)}>
+          <Button variant="ghost" size="icon" onClick={handleNotificationClick}>
             <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            )}
           </Button>
           {notificationsOpen && <NotificationDropdown onClose={() => setNotificationsOpen(false)} />}
         </div>
@@ -41,6 +53,7 @@ export default function DashboardHeader() {
           </Button>
         </div>
       </div>
+      <EnablePushPopup />
     </header>
   )
 }

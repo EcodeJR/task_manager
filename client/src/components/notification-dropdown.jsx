@@ -9,10 +9,11 @@ import { CheckCheck, Info, AlertTriangle, AlertCircle } from "lucide-react"
 
 export default function NotificationDropdown({ onClose }) {
   const { user } = useAuth()
-  const { getUserNotifications, markAllAsRead, markAsRead } = useNotifications()
+  const { getDepartmentNotifications, getDepartmentUnreadCount, markAllAsRead, markAsRead } = useNotifications()
   const dropdownRef = useRef(null)
 
-  const notifications = user ? getUserNotifications(user.id) : []
+  const notifications = user ? getDepartmentNotifications() : []
+  const unreadCount = user ? getDepartmentUnreadCount() : 0;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -65,7 +66,7 @@ export default function NotificationDropdown({ onClose }) {
           variant="ghost"
           size="sm"
           onClick={() => markAllAsRead()}
-          disabled={!notifications.some((n) => !n.read)}
+          disabled={unreadCount === 0}
         >
           Mark all as read
         </Button>
@@ -78,21 +79,29 @@ export default function NotificationDropdown({ onClose }) {
           </div>
         ) : (
           <div className="divide-y">
-            {notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`flex cursor-pointer gap-3 p-3 hover:bg-muted/50 ${
-                  notification.read ? "opacity-70" : "bg-muted/20"
-                }`}
-                onClick={() => markAsRead(notification.id)}
-              >
-                <div className="mt-0.5 flex-shrink-0">{getNotificationIcon(notification.type)}</div>
-                <div className="flex-1">
-                  <p className="text-sm">{notification.message}</p>
-                  <p className="text-xs text-muted-foreground">{formatTime(notification.timestamp)}</p>
+            {notifications.map((notification) => {
+              const isRead = notification.readBy && user && notification.readBy.map(id => id.toString()).includes(user.id.toString());
+              return (
+                <div
+                  key={notification.id}
+                  className={`flex cursor-pointer gap-3 p-3 hover:bg-muted/50 ${
+                    isRead ? "opacity-70" : "bg-muted/20"
+                  }`}
+                  onClick={() => markAsRead(notification.id)}
+                >
+                  <div className="mt-0.5 flex-shrink-0">{getNotificationIcon(notification.type)}</div>
+                  <div className="flex-1">
+                    <p className="text-sm">{notification.message}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {notification.createdBy && (
+                        <span className="font-semibold mr-1">{notification.createdBy}</span>
+                      )}
+                      {formatTime(notification.timestamp)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </ScrollArea>
