@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { useToast } from "../hooks/use-toast"
+import { useToast } from '../hooks/toast-context'
 import { useAuth } from "../lib/auth-context"
 import { useNotifications } from "../lib/notification-context"
 import { CheckCircle2, UserX, XCircle } from "lucide-react"
@@ -99,6 +99,26 @@ export default function UsersPage() {
       })
     }
   }
+
+  const handlePromoteUser = async (userId) => {
+    try {
+      await api.put(`/users/${userId}/promote`);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, role: "admin", approved: true } : u))
+      );
+      const promotedUser = users.find((u) => u.id === userId);
+      toast({
+        title: "User promoted",
+        description: `${promotedUser?.name || "User"} is now an admin`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || error?.message || "Failed to promote user",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleRejectUser = async (userId) => {
     try {
@@ -198,31 +218,35 @@ export default function UsersPage() {
           <CardContent>
             <div className="space-y-4">
               {pendingUsers.map((pendingUser) => (
-                <div key={pendingUser.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div key={pendingUser.id} className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border p-4 gap-3">
                   <div>
-                    <h3 className="font-medium">{pendingUser.name}</h3>
-                    <p className="text-sm text-muted-foreground">{pendingUser.email}</p>
-                    <p className="text-xs text-muted-foreground">Department: {pendingUser.department.name}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium truncate max-w-[200px]">{pendingUser.name}</h3>
+                      <p className="text-sm text-muted-foreground break-all truncate max-w-[200px]">{pendingUser.email}</p>
+                      <p className="text-xs text-muted-foreground truncate max-w-[200px]">Department: {pendingUser.department.name}</p>
+                    </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-green-500 hover:text-green-600"
-                      onClick={() => handleApproveUser(pendingUser.id)}
-                    >
-                      <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Approve
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-500 hover:text-red-600"
-                      onClick={() => handleRejectUser(pendingUser.id)}
-                    >
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Reject
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-green-500 hover:text-green-600 w-full sm:w-auto"
+                        onClick={() => handleApproveUser(pendingUser.id)}
+                      >
+                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                        Approve
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-500 hover:text-red-600 w-full sm:w-auto"
+                        onClick={() => handleRejectUser(pendingUser.id)}
+                      >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Reject
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -241,29 +265,43 @@ export default function UsersPage() {
               <p className="text-center text-sm text-muted-foreground">No approved users found in your department</p>
             ) : (
               approvedUsers.map((approvedUser) => (
-                <div key={approvedUser.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div key={approvedUser.id} className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border p-4 gap-3">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{approvedUser.name}</h3>
-                      {approvedUser.role === "admin" && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                          Admin
-                        </span>
-                      )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium truncate max-w-[200px]">{approvedUser.name}</h3>
+                        {approvedUser.role === "admin" && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                            Admin
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground break-all truncate max-w-[200px]">{approvedUser.email}</p>
+                      <p className="text-xs text-muted-foreground truncate max-w-[200px]">Department: {approvedUser.department.name}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{approvedUser.email}</p>
-                    <p className="text-xs text-muted-foreground">Department: {approvedUser.department.name}</p>
                   </div>
                   {approvedUser.id !== user?.id && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-600"
-                      onClick={() => handleRejectUser(approvedUser.id)}
-                    >
-                      <UserX className="mr-2 h-4 w-4" />
-                      Remove
-                    </Button>
+                    <div className="flex gap-2">
+                      {approvedUser.role !== "admin" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-700"
+                          onClick={() => handlePromoteUser(approvedUser.id)}
+                        >
+                          Promote to Admin
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-600"
+                        onClick={() => handleRejectUser(approvedUser.id)}
+                      >
+                        <UserX className="mr-2 h-4 w-4" />
+                        Remove
+                      </Button>
+                    </div>
                   )}
                 </div>
               ))

@@ -58,7 +58,11 @@ export default function EnablePushPopup() {
       }
       setShowPopup(false);
     } catch (err) {
-      setError(err.message);
+      if (window.Notification && Notification.permission === 'denied') {
+        setError('You have blocked notifications for this site. Please enable notifications in your browser settings to use this feature.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

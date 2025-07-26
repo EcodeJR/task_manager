@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import { Checkbox } from "../components/ui/checkbox"
-import { useToast } from "../hooks/use-toast"
+import { useToast } from '../hooks/toast-context'
 import { useAuth } from "../lib/auth-context"
 import { useNotifications } from "../lib/notification-context"
 import { useTasks } from "../lib/task-context"

@@ -1,6 +1,6 @@
 "use client"
 import { Toast, ToastClose, ToastDescription, ToastTitle } from "./toast"
-import { useToast } from "../../hooks/use-toast"
+import { useToast } from "../../hooks/toast-context"
 
 export function Toaster() {
   const { toasts, dismiss } = useToast()

@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem("taskyToken", token)
       setUser(user)
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Login failed")
+      throw error;
     } finally {
       setLoading(false)
     }
@@ -77,7 +77,30 @@ export function AuthProvider({ children }) {
         setUser(res.data.user)
       }
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Registration failed")
+      throw error;
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Register an admin user
+  const adminRegister = async (userData) => {
+    setLoading(true)
+    try {
+      const department = departments.find((d) => d.id === userData.departmentId)
+      if (!department) {
+        throw new Error("Invalid department")
+      }
+      const res = await api.post("/auth/register-admin", {
+        ...userData,
+        departmentName: department.name,
+      })
+      if (res.data.token && res.data.user) {
+        localStorage.setItem("taskyToken", res.data.token)
+        setUser(res.data.user)
+      }
+    } catch (error) {
+      throw error;
     } finally {
       setLoading(false)
     }
@@ -88,7 +111,7 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  return <AuthContext.Provider value={{ user, loading, login, register, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading, login, register, adminRegister, logout }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

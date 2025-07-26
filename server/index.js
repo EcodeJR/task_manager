@@ -22,9 +22,9 @@ require("./jobs/taskNotifications")
 // Set CORS origin from .env (CLIENT_ORIGIN)
 // Allow multiple origins for CORS (comma-separated in CLIENT_ORIGIN)
 const allowedOrigins = [
-  process.env.CLIENT_ORIGIN,
-  "http://localhost:3000"
+  process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.CLIENT_ORIGIN,
 ].filter(Boolean);
+console.log("Allowed origins:", allowedOrigins);
 app.use(cors({
   origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {

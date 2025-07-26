@@ -10,35 +10,39 @@ import UsersPage from "./pages/users"
 import ProtectedRoute from "./components/protected-route"
 import AdminRoute from "./components/admin-route"
 
+import { ToastProvider } from "./hooks/toast-context";
+
 function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <Routes>
-        <Route path="/" element={<Navigate to="/auth" replace />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="tasks" element={<TasksPage />} />
-          <Route path="chat" element={<ChatPage />} />
+    <ToastProvider>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <Routes>
+          <Route path="/" element={<Navigate to="/auth" replace />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route
-            path="users"
+            path="/dashboard"
             element={
-              <AdminRoute>
-                <UsersPage />
-              </AdminRoute>
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
             }
-          />
-        </Route>
-      </Routes>
-      <Toaster />
-    </ThemeProvider>
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="chat" element={<ChatPage />} />
+            <Route
+              path="users"
+              element={
+                <AdminRoute>
+                  <UsersPage />
+                </AdminRoute>
+              }
+            />
+          </Route>
+        </Routes>
+        <Toaster />
+      </ThemeProvider>
+    </ToastProvider>
   )
 }
 

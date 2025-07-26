@@ -3,6 +3,49 @@ const jwt = require("jsonwebtoken")
 const User = require("../models/User")
 const router = express.Router()
 
+// Register a new admin (invite code required)
+router.post("/register-admin", async (req, res) => {
+  try {
+    const { name, email, password, departmentId, departmentName, inviteCode } = req.body;
+    // Validate required fields
+    if (!name || !email || !password || !departmentId || !departmentName || !inviteCode) {
+      return res.status(400).json({ message: "Missing required fields: name, email, password, departmentId, departmentName, inviteCode are all required." });
+    }
+    if (inviteCode !== process.env.ADMIN_INVITE_CODE) {
+      return res.status(403).json({ message: "Invalid or missing invite code" });
+    }
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+    const user = new User({
+      name,
+      email,
+      password,
+      role: "admin",
+      department: { id: departmentId, name: departmentName },
+      approved: true,
+    });
+    await user.save();
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    return res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        approved: user.approved,
+      },
+    });
+  } catch (error) {
+    console.error(error.stack || error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Register a new user
 router.post("/register", async (req, res) => {
   try {

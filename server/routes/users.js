@@ -16,6 +16,33 @@ router.get("/department", auth, async (req, res) => {
   }
 })
 
+// Promote a staff user to admin (admin only)
+router.put('/:id/promote', [auth, adminAuth], async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.role === 'admin') {
+      return res.status(400).json({ message: 'User is already an admin' });
+    }
+    user.role = 'admin';
+    user.approved = true;
+    await user.save();
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+      approved: user.approved,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Approve a user (admin only)
 router.put("/:id/approve", [auth, adminAuth], async (req, res) => {
   try {
